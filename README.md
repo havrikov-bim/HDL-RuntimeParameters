@@ -61,7 +61,7 @@ The included implementation recognizes the exact four family names in its `RECT_
 
 The Absolute Elevation configuration intentionally contains placeholders and must be customized. The Opening Size configuration is supplied with its actual target GUID; the parameter and supported families must exist in the project. Opening a document does not automatically recalculate all existing values. Use **HDL → Parameters → Recalculate Parameters** for a manual refresh.
 
-Requires Autodesk Revit and pyRevit. The implementation uses IronPython-era APIs (`imp`, `ElementId.IntegerValue`); a supported Revit/pyRevit version matrix has not yet been established.
+Requires Autodesk Revit and pyRevit. The supplied code uses `imp` to load Python services and `ElementId.IntegerValue` to access Revit category IDs. Compatibility with specific Revit versions and pyRevit Python engines has not yet been systematically verified.
 
 ## Configuration example
 
