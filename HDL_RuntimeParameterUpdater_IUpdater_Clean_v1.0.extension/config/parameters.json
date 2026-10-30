@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "services": [
+    {
+      "service": "absolute_elevation.py",
+      "parameters": [
+        {
+          "name": "SP_BOM_Absolute_Elevation",
+          "guid": "REPLACE-WITH-SP-BOM-ABSOLUTE-ELEVATION-GUID"
+        }
+      ],
+      "scope": {
+        "categories": [],
+        "families": [
+          "REPLACE-WITH-FAMILY-NAME-01"
+        ]
+      },
+      "enabled": true
+    }
+  ]
+}

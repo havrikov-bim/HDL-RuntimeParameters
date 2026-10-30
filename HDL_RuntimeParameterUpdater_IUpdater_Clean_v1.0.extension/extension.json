@@ -1,0 +1,5 @@
+{
+  "name": "HDL Runtime Parameter Updater",
+  "description": "Runtime shared parameter updater based on Revit IUpdater.",
+  "author": "HDL"
+}
