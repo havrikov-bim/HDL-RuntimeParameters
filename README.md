@@ -23,7 +23,9 @@ The runtime mechanism is independent of the calculation itself. JSON defines tar
 - Updates within the transaction that triggered the updater, without a separate runtime transaction or Idling queue.
 - Cached JSON configuration and service loading from external Python files.
 
-The supplied calculation service is **Absolute Elevation**:
+Two calculation services are included.
+
+### Absolute Elevation — `absolute_elevation.py`
 
 ```text
 SP_BOM_Absolute_Elevation = Level.Elevation + INSTANCE_ELEVATION_PARAM
@@ -31,19 +33,32 @@ SP_BOM_Absolute_Elevation = Level.Elevation + INSTANCE_ELEVATION_PARAM
 
 This formula uses the level's API elevation and the instance's elevation-from-level parameter. It does not perform an explicit survey/shared-coordinate transformation. Confirm that its coordinate convention matches your project's elevation requirements.
 
-**Opening Size is not included in this source package.** A shape-dependent size service can use the same interface, but the corresponding implementation was not part of the supplied v1.0 archive.
+### Opening Size — `op_opening_size.py`
+
+Calculates `SP_OP_Size` as text for the four supported round/rectangular wall/floor families:
+
+| Shape | Inputs | Output format |
+| --- | --- | --- |
+| Rectangular | `SP_OP_Width`, `SP_OP_Height`, `SP_OP_Description` | Description on the first line, then `width x height(H)` in centimeters |
+| Round | `SP_OP_Diameter`, `SP_OP_Description` | `ødiameter" description`, with diameter in inches |
+
+For example, a 400 × 250 mm rectangular opening described as `Opening` produces `Opening` followed by `40 x 25(H)` on a second line. A 4-inch round opening produces `ø4" Opening`. Numbers use up to two decimal places without trailing zeros.
+
+Input lookup first checks the instance and then the family type if the named parameter is absent. The output must be a shared Text instance parameter with GUID `51c5bd0e-4839-43aa-80f8-ffe67faa1a7e`. This GUID is also fixed in the service's `TARGET_GUID`; change both the service constant and JSON if you use another parameter definition.
+
+The included implementation recognizes the exact four family names in its `RECT_FAMILIES` and `ROUND_FAMILIES` sets. Other families or shapes need corresponding service changes.
 
 ## Download and installation
 
-1. [Download the original v1.0 extension ZIP](https://github.com/havrikov-bim/HDL-RuntimeParameters/raw/refs/heads/main/downloads/HDL_RuntimeParameterUpdater_IUpdater_Clean_v1.0.zip), or use **Code → Download ZIP** for source and documentation.
+1. [Download the v1.0 package with both services](https://github.com/havrikov-bim/HDL-RuntimeParameters/raw/refs/heads/main/downloads/HDL_RuntimeParameters_v1.0_two_services.zip), or use **Code → Download ZIP** for source and documentation.
 2. Remove the previous `HDL_RuntimeParameterUpdater.extension` if installed. Do not merge this package with an earlier DocumentChanged/Idling-based version or keep duplicate runtime updaters active.
 3. Extract `HDL_RuntimeParameterUpdater_IUpdater_Clean_v1.0.extension` into your pyRevit extensions directory, normally `%APPDATA%\pyRevit\Extensions`.
-4. Edit `config/parameters.json` inside the extension. Replace the placeholder GUID with the actual shared parameter GUID and enter exact family names or category names.
+4. Edit `config/parameters.json` inside the extension. Replace the Absolute Elevation placeholder GUID and family names with your project values. The Opening Size entry already lists the four supported families and its fixed output GUID.
 5. Make sure the shared instance parameter already exists and can be written through the API. This extension does not create or bind parameters.
 6. Reload pyRevit once. Open or activate the target project to register its updater.
 7. Add or move a configured instance, inspect the computed value, then check Undo/Redo in the target Revit session.
 
-The distributed configuration intentionally contains placeholders. It must be customized before the example service can update project data. There is no ribbon command or initial full-model recalculation in this package.
+The Absolute Elevation configuration intentionally contains placeholders and must be customized. The Opening Size configuration is supplied with its actual target GUID; the parameter and supported families must exist in the project. There is no ribbon command or initial full-model recalculation in this package.
 
 Requires Autodesk Revit and pyRevit. The implementation uses IronPython-era APIs (`imp`, `ElementId.IntegerValue`); a supported Revit/pyRevit version matrix has not yet been established.
 
@@ -58,12 +73,33 @@ Requires Autodesk Revit and pyRevit. The implementation uses IronPython-era APIs
       "parameters": [
         {
           "name": "SP_BOM_Absolute_Elevation",
-          "guid": "REPLACE-WITH-ACTUAL-SHARED-PARAMETER-GUID"
+          "guid": "REPLACE-WITH-SP-BOM-ABSOLUTE-ELEVATION-GUID"
         }
       ],
       "scope": {
         "categories": [],
-        "families": ["BL Opening Rect Wall", "BL Opening Round Wall"]
+        "families": [
+          "REPLACE-WITH-FAMILY-NAME-01"
+        ]
+      },
+      "enabled": true
+    },
+    {
+      "service": "op_opening_size.py",
+      "parameters": [
+        {
+          "name": "SP_OP_Size",
+          "guid": "51c5bd0e-4839-43aa-80f8-ffe67faa1a7e"
+        }
+      ],
+      "scope": {
+        "categories": [],
+        "families": [
+          "BL Opening Rect Floor",
+          "BL Opening Rect Wall",
+          "BL Opening Round Floor",
+          "BL Opening Round Wall"
+        ]
       },
       "enabled": true
     }
@@ -96,6 +132,6 @@ See [Architecture and limitations](docs/ARCHITECTURE.md) and [Writing calculatio
 
 ## Validation
 
-Repository preparation checks Python syntax, JSON readability and byte-for-byte preservation of the supplied extension. Revit is unavailable in the preparation environment. Actual updater registration, trigger behavior, parameter writes, performance and Undo/Redo require verification in Revit. No automated Revit runtime test suite is included.
+Repository preparation checks Python syntax, JSON readability and preservation of the original Python source files. Opening Size calculation tests check formatting, units, type fallback, missing inputs and target GUID matching with Revit API substitutes. Run `python -m unittest discover -s tests -v` from the repository root. Revit is unavailable in the preparation environment. Actual updater registration, trigger behavior, parameter writes, performance and Undo/Redo require verification in Revit. No automated Revit runtime test suite is included.
 
 Report reproducible behavior in [Issues](https://github.com/havrikov-bim/HDL-RuntimeParameters/issues), including Revit/pyRevit versions, sanitized configuration, affected family and the steps that should trigger an update.

@@ -16,6 +16,25 @@
         ]
       },
       "enabled": true
+    },
+    {
+      "service": "op_opening_size.py",
+      "parameters": [
+        {
+          "name": "SP_OP_Size",
+          "guid": "51c5bd0e-4839-43aa-80f8-ffe67faa1a7e"
+        }
+      ],
+      "scope": {
+        "categories": [],
+        "families": [
+          "BL Opening Rect Floor",
+          "BL Opening Rect Wall",
+          "BL Opening Round Floor",
+          "BL Opening Round Wall"
+        ]
+      },
+      "enabled": true
     }
   ]
 }

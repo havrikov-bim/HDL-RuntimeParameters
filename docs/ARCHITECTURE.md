@@ -17,6 +17,7 @@ All paths below are relative to `HDL_RuntimeParameterUpdater_IUpdater_Clean_v1.0
 | `lib/hdl_runtime/updater.py` | Match instances, resolve targets, invoke services and write changed values |
 | `lib/hdl_runtime/service_loader.py` | Load Python modules from the services directory |
 | `lib/hdl_runtime/services/absolute_elevation.py` | Calculate level elevation plus instance elevation from level |
+| `lib/hdl_runtime/services/op_opening_size.py` | Format a round or rectangular opening size and description into `SP_OP_Size` |
 
 ## Registration
 
@@ -61,6 +62,10 @@ Service modules are loaded through `imp.load_source`; their names include the fi
 The supplied service reads `element.LevelId`, requires a Level, reads the Double `INSTANCE_ELEVATION_PARAM` and calculates `level.Elevation + elevation_from_level`. It returns the result for configured specifications named `SP_BOM_Absolute_Elevation`. Values stay in Revit's internal length units.
 
 If a level or the instance elevation parameter is unavailable, the service returns an empty dictionary and leaves existing values unchanged. This formula does not add an explicit project/survey coordinate transform. Its meaning must be checked against the elevation convention of the target family and project.
+
+## Opening Size service
+
+The second service classifies four exact BL Opening family names and reads `SP_OP_*` dimensions and description from the instance, with type fallback for absent inputs. It converts dimensions to centimeters for rectangles and inches for round openings, then returns formatted text for fixed target GUID `51c5bd0e-4839-43aa-80f8-ffe67faa1a7e`. See [the service guide](SERVICES.md#shape-dependent-opening-size) for the precise input/output contract.
 
 ## Boundaries and future work
 

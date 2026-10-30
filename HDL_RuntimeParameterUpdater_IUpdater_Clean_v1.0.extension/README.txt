@@ -37,3 +37,9 @@ Installation:
 
 Editing service .py files does not require Reload.
 parameters.json is watched by mtime; view activation refreshes trigger registration.
+
+Additional supplied service: op_opening_size.py
+SP_OP_Size target GUID: 51c5bd0e-4839-43aa-80f8-ffe67faa1a7e
+Rectangles: description + newline + width x height(H), in cm.
+Round openings: diameter in inches + description.
+See repository README.md and docs/SERVICES.md for input names and setup.
