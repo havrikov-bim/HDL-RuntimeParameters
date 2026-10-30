@@ -1,5 +1,7 @@
 # HDL Runtime Parameters
 
+**Status: In development. Core functionality is implemented; testing and further development are ongoing.**
+
 English · [Русский](README.ru.md)
 
 Automatic calculation and updating of shared instance parameters in Autodesk Revit using configurable Python services and Revit `IUpdater`.
