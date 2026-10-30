@@ -41,7 +41,7 @@ The configured name is significant to this service; the dispatcher itself resolv
 2. Add a service module with the `calculate` interface.
 3. Add an enabled entry in the JSON configuration with the filename, target parameter and applicable families/categories.
 4. Activate a project view to refresh registration after saving configuration.
-5. Perform an applicable element-addition or geometry-change action.
+5. Run **HDL → Parameters → Recalculate Parameters** for existing elements, or perform an applicable element-addition/geometry-change action.
 6. Check the stored value and Undo/Redo in Revit.
 
 Use exact names. A family selector and a category selector have OR semantics, so a category can substantially broaden the service's scope.
@@ -56,7 +56,7 @@ Return `{}` when the calculation is inapplicable; return `None` for an output to
 
 A service runs for additions and geometry changes in its registered scope. Reading another parameter does not automatically subscribe the service to changes in that parameter. Likewise, reading a Level does not establish a trigger that recalculates every dependent instance when that Level changes.
 
-A calculation requiring such behavior needs additional trigger/dependency design. The current service interface should not be described as a complete formula or dependency engine.
+Use the [manual recalculation command](RECALCULATE.md) to refresh matching existing elements when these changes do not trigger runtime updates. Automatic propagation requires additional trigger/dependency design. The current service interface should not be described as a complete formula or dependency engine.
 
 ## Shape-dependent Opening Size
 

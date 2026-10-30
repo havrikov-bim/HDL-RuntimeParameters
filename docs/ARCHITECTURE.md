@@ -67,10 +67,16 @@ If a level or the instance elevation parameter is unavailable, the service retur
 
 The second service classifies four exact BL Opening family names and reads `SP_OP_*` dimensions and description from the instance, with type fallback for absent inputs. It converts dimensions to centimeters for rectangles and inches for round openings, then returns formatted text for fixed target GUID `51c5bd0e-4839-43aa-80f8-ffe67faa1a7e`. See [the service guide](SERVICES.md#shape-dependent-opening-size) for the precise input/output contract.
 
+## Manual recalculation extension
+
+`HDL_Recalculate_Parameters.extension` is a separate sibling extension contributing the ribbon button **HDL → Parameters → Recalculate Parameters**. It discovers the runtime folder, loads the same enabled rules and services, collects matching active-project elements and writes changed values in one transaction. It does not change updater registration or add an event handler. Its writer additionally supports ElementId values.
+
+This provides explicit batch recalculation; it does not introduce automatic dependency propagation. See [Recalculate Parameters](RECALCULATE.md) for discovery rules, processing scope and partial-error behavior.
+
 ## Boundaries and future work
 
 This version provides event-driven dispatch and shared-parameter writing. It does not implement a dependency graph, ordered formula evaluation, automatic downstream propagation or cycle detection. Rule list order alone does not establish a dependency system.
 
-Broad exception handling currently suppresses many registration, loading, calculation and write failures. Future diagnostics should distinguish inapplicable instances from invalid configuration and failed calculations. Initial/batch recalculation, parameter-specific triggers, level/location dependencies, stricter validation, explicit unregistration and runtime compatibility checks are possible improvements; they are not included capabilities.
+Broad exception handling currently suppresses many registration, loading, calculation and write failures. Future diagnostics should distinguish inapplicable instances from invalid configuration and failed calculations. Automatic initial recalculation, parameter-specific triggers, automatic level/location dependency propagation, stricter validation, explicit unregistration and runtime compatibility checks are possible improvements. Explicit batch recalculation is supplied by the separate manual command.
 
 The fixed updater GUID and session state key are another reason not to run duplicate versions of this extension side by side.

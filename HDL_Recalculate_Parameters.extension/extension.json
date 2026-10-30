@@ -1,0 +1,5 @@
+{
+  "name": "HDL Recalculate Parameters",
+  "description": "Manual recalculation using installed HDL Runtime Parameter Updater services",
+  "author": "HDL"
+}

@@ -2,7 +2,7 @@
 
 Automatic calculation and updating of shared instance parameters in Autodesk Revit using configurable Python services and Revit `IUpdater`.
 
-**Version: 1.0** · Author: Dmytro Havrikov · Delivery: pyRevit extension
+**Version: 1.0** · Author: Dmytro Havrikov · Delivery: pyRevit extensions
 
 ## Concept
 
@@ -22,6 +22,7 @@ The runtime mechanism is independent of the calculation itself. JSON defines tar
 - Double, Integer and String result writing, skipping missing/read-only parameters, `None` results and unchanged values.
 - Updates within the transaction that triggered the updater, without a separate runtime transaction or Idling queue.
 - Cached JSON configuration and service loading from external Python files.
+- **Recalculate Parameters**: a separate ribbon command for manually recalculating configured outputs across the active project using the same services.
 
 Two calculation services are included.
 
@@ -50,15 +51,15 @@ The included implementation recognizes the exact four family names in its `RECT_
 
 ## Download and installation
 
-1. [Download the v1.0 package with both services](https://github.com/havrikov-bim/HDL-RuntimeParameters/raw/refs/heads/main/downloads/HDL_RuntimeParameters_v1.0_two_services.zip), or use **Code → Download ZIP** for source and documentation.
+1. [Download the complete v1.0 package](https://github.com/havrikov-bim/HDL-RuntimeParameters/raw/refs/heads/main/downloads/HDL_RuntimeParameters_v1.0_complete.zip), or use **Code → Download ZIP** for source and documentation.
 2. Remove the previous `HDL_RuntimeParameterUpdater.extension` if installed. Do not merge this package with an earlier DocumentChanged/Idling-based version or keep duplicate runtime updaters active.
-3. Extract `HDL_RuntimeParameterUpdater_IUpdater_Clean_v1.0.extension` into your pyRevit extensions directory, normally `%APPDATA%\pyRevit\Extensions`.
+3. Copy both `HDL_RuntimeParameterUpdater_IUpdater_Clean_v1.0.extension` and `HDL_Recalculate_Parameters.extension` into your pyRevit extensions directory, normally `%APPDATA%\pyRevit\Extensions`. Keep them as sibling folders.
 4. Edit `config/parameters.json` inside the extension. Replace the Absolute Elevation placeholder GUID and family names with your project values. The Opening Size entry already lists the four supported families and its fixed output GUID.
 5. Make sure the shared instance parameter already exists and can be written through the API. This extension does not create or bind parameters.
 6. Reload pyRevit once. Open or activate the target project to register its updater.
 7. Add or move a configured instance, inspect the computed value, then check Undo/Redo in the target Revit session.
 
-The Absolute Elevation configuration intentionally contains placeholders and must be customized. The Opening Size configuration is supplied with its actual target GUID; the parameter and supported families must exist in the project. There is no ribbon command or initial full-model recalculation in this package.
+The Absolute Elevation configuration intentionally contains placeholders and must be customized. The Opening Size configuration is supplied with its actual target GUID; the parameter and supported families must exist in the project. Opening a document does not automatically recalculate all existing values. Use **HDL → Parameters → Recalculate Parameters** for a manual refresh.
 
 Requires Autodesk Revit and pyRevit. The implementation uses IronPython-era APIs (`imp`, `ElementId.IntegerValue`); a supported Revit/pyRevit version matrix has not yet been established.
 
@@ -119,19 +120,25 @@ Family and category selectors use **OR** semantics: either a matching family or 
 4. The service returns a dictionary mapping parameter GUID strings to calculated values.
 5. Changed writable values are set within the triggering transaction. Double values use a comparison tolerance of `1e-9` in their stored units.
 
-See [Architecture and limitations](docs/ARCHITECTURE.md) and [Writing calculation services](docs/SERVICES.md).
+## Manual recalculation
+
+**HDL → Parameters → Recalculate Parameters** processes matching elements in the active project using the runtime extension's existing rules and services. Use it after configuration changes, for existing instances, or when a level/project-reference or description change has not triggered an instance update. It runs in one transaction and reports checked/updated elements, updated parameters and errors.
+
+The button discovers the runtime extension in the same parent extensions directory. It does not process only the current selection or view. See [Recalculate Parameters](docs/RECALCULATE.md) for installation, scope, discovery and error-handling details.
+
+See also [Architecture and limitations](docs/ARCHITECTURE.md) and [Writing calculation services](docs/SERVICES.md).
 
 ## Current limitations
 
-- Existing elements are not automatically recalculated when the extension is installed or a document is opened. An applicable addition/geometry change is needed.
-- Parameter-only changes that do not affect geometry are not explicitly registered as triggers.
-- Changes to levels, project location or other dependent elements do not have a dedicated dependency mechanism to refresh every affected instance.
+- Existing elements are not automatically recalculated when the extension is installed or a document is opened. Use the manual command or an applicable instance addition/geometry change.
+- Parameter-only changes that do not affect geometry are not explicitly registered as runtime triggers; the manual command can refresh their outputs.
+- Changes to levels, project location or other dependent elements do not have dedicated runtime dependency propagation. Use the manual command where needed, retaining the coordinate convention implemented by each service.
 - No expression parser, formula editor, dependency graph, cycle detection, unit conversion layer or read-only protection for calculated values is included.
 - Calculation failures are generally skipped without a diagnostic report. Malformed configuration is not handled by a comprehensive validation layer.
 - Service files are executable Python code. Use services you trust and keep their calculations predictable.
 
 ## Validation
 
-Repository preparation checks Python syntax, JSON readability and preservation of the original Python source files. Opening Size calculation tests check formatting, units, type fallback, missing inputs and target GUID matching with Revit API substitutes. Run `python -m unittest discover -s tests -v` from the repository root. Revit is unavailable in the preparation environment. Actual updater registration, trigger behavior, parameter writes, performance and Undo/Redo require verification in Revit. No automated Revit runtime test suite is included.
+Repository preparation checks Python syntax, JSON readability and preservation of the supplied Python source files, including the manual command. Opening Size calculation tests check formatting, units, type fallback, missing inputs and target GUID matching with Revit API substitutes. Run `python -m unittest discover -s tests -v` from the repository root. Revit is unavailable in the preparation environment. Actual updater registration, trigger behavior, parameter writes, performance and Undo/Redo require verification in Revit. No automated Revit runtime test suite is included.
 
 Report reproducible behavior in [Issues](https://github.com/havrikov-bim/HDL-RuntimeParameters/issues), including Revit/pyRevit versions, sanitized configuration, affected family and the steps that should trigger an update.
