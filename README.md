@@ -1,12 +1,22 @@
 # HDL Runtime Parameters
 
-**Status: In development. Core functionality is implemented; testing and further development are ongoing.**
+**Status: Experimental Python prototype. Used to explore the architecture and validate automatic parameter updates through the Revit API.**
 
 English · [Русский](README.ru.md)
 
 Automatic calculation and updating of shared instance parameters in Autodesk Revit using configurable Python services and Revit `IUpdater`.
 
-**Version: 1.0** · Author: Dmytro Havrikov · Delivery: pyRevit extensions
+**Prototype version: 1.0** · Author: Dmytro Havrikov · Execution environment: pyRevit
+
+## Purpose and scope
+
+This repository contains a Python prototype of an automatic parameter-update engine. It is used to test the architecture, Revit API event handling and service-based calculation rules against practical BIM tasks.
+
+pyRevit provides the entry point and a convenient environment for running and debugging the prototype. The calculation rules are implemented in separate Python services.
+
+The examples calculate an element's absolute elevation and a text representation of an opening's size. A separate command tests forced recalculation when instance updates are not triggered automatically.
+
+The prototype is configured through JSON and Python files; it has no configuration UI. A user interface and a complete end-user workflow belong to the separate commercial product development. This repository documents the experimental implementation and its current limitations.
 
 ## Concept
 
